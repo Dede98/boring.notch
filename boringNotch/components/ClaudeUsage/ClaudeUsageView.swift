@@ -227,16 +227,6 @@ struct CompactProviderBadge: View {
                     .foregroundColor(.white.opacity(0.35))
             }
         }
-        .padding(.horizontal, isActive ? 5 : 0)
-        .padding(.vertical, isActive ? 3 : 0)
-        .background(
-            Capsule()
-                .fill(.white.opacity(isActive ? 0.08 : 0))
-        )
-        .overlay(
-            Capsule()
-                .stroke(.white.opacity(isActive ? 0.12 : 0), lineWidth: 1)
-        )
     }
 
     private var compactValueColor: Color {

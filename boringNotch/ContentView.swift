@@ -104,14 +104,13 @@ struct ContentView: View {
     private func compactWidth(for provider: UsageProviderDisplay, includeReset: Bool = false) -> CGFloat {
         let valueLength = provider.compactValueText.count
         let textWidth = CGFloat(valueLength * 7)
-        let highlightInset: CGFloat = provider.id != "claude" && provider.id == claudeUsageVM.activeCompactProviderID ? 12 : 0
         let resetWidth: CGFloat = {
             guard includeReset, let reset = provider.compactResetText else {
                 return 0
             }
             return reset.contains("h") ? 44 : 28
         }()
-        return 18 + textWidth + resetWidth + highlightInset
+        return 18 + textWidth + resetWidth
     }
 
     var body: some View {
