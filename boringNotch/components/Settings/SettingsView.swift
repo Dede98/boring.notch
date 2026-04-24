@@ -51,6 +51,22 @@ struct SettingsView: View {
                 NavigationLink(value: "Shelf") {
                     Label("Shelf", systemImage: "books.vertical")
                 }
+                NavigationLink(value: "Claude") {
+                    Label {
+                        Text("AI Usage")
+                    } icon: {
+                        HStack(spacing: 3) {
+                            Image("claude-icon")
+                                .resizable()
+                                .renderingMode(.template)
+                                .frame(width: 12, height: 12)
+                            Image("openai-icon")
+                                .resizable()
+                                .renderingMode(.template)
+                                .frame(width: 12, height: 12)
+                        }
+                    }
+                }
                 NavigationLink(value: "Shortcuts") {
                     Label("Shortcuts", systemImage: "keyboard")
                 }
@@ -87,6 +103,8 @@ struct SettingsView: View {
                     Shelf()
                 case "Shortcuts":
                     Shortcuts()
+                case "Claude":
+                    ClaudeUsageSettings()
                 case "Extensions":
                     GeneralSettings()
                 case "Advanced":
