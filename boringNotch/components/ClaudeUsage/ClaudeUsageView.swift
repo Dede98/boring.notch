@@ -145,6 +145,21 @@ struct UsageMeterRow: View {
 struct ClaudeUsageCompactView: View {
     static let notchSpacerExtra: CGFloat = 34
 
+    @EnvironmentObject var vm: BoringViewModel
+
+    var body: some View {
+        CompactUsageSplitRow()
+            .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
+    }
+}
+
+struct ClaudeUsageClosedOverlay: View {
+    var body: some View {
+        CompactUsageMediaOverlayRow()
+    }
+}
+
+private struct CompactUsageSplitRow: View {
     @ObservedObject var usageVM = ClaudeUsageViewModel.shared
     @EnvironmentObject var vm: BoringViewModel
 
@@ -166,7 +181,7 @@ struct ClaudeUsageCompactView: View {
                     CompactProviderBadge(
                         provider: provider,
                         includeReset: true,
-                        isActive: false
+                        isActive: true
                     )
                 }
             }
@@ -174,7 +189,7 @@ struct ClaudeUsageCompactView: View {
 
             Rectangle()
                 .fill(.black)
-                .frame(width: vm.closedNotchSize.width + Self.notchSpacerExtra)
+                .frame(width: vm.closedNotchSize.width + ClaudeUsageCompactView.notchSpacerExtra)
 
             if usageVM.isStale {
                 Text("stale")
@@ -186,25 +201,65 @@ struct ClaudeUsageCompactView: View {
                         CompactProviderBadge(
                             provider: provider,
                             includeReset: true,
-                            isActive: provider.id == usageVM.activeCompactProviderID
+                            isActive: true
                         )
                     }
                 }
             }
         }
-        .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
     }
 }
 
-struct ClaudeUsageClosedOverlay: View {
+private struct CompactUsageMediaOverlayRow: View {
     @ObservedObject var usageVM = ClaudeUsageViewModel.shared
+    @EnvironmentObject var vm: BoringViewModel
+
+    private var leftProviders: [UsageProviderDisplay] {
+        let claudeProviders = usageVM.providers.filter { $0.id == "claude" }
+        return claudeProviders.isEmpty ? Array(usageVM.providers.prefix(1)) : claudeProviders
+    }
+
+    private var rightProviders: [UsageProviderDisplay] {
+        usageVM.providers.filter { provider in
+            !leftProviders.contains { $0.id == provider.id }
+        }
+    }
+
+    private var mediaLiveActivityWidth: CGFloat {
+        vm.closedNotchSize.width + 2 * max(0, vm.effectiveClosedNotchHeight - 12) + 20
+    }
 
     var body: some View {
-        if let provider = usageVM.activeCompactProvider {
-            CompactProviderBadge(provider: provider, includeReset: true, isActive: true)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
+        HStack(spacing: 0) {
+            HStack(spacing: 8) {
+                ForEach(leftProviders) { provider in
+                    CompactProviderBadge(
+                        provider: provider,
+                        includeReset: true,
+                        isActive: true
+                    )
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            if usageVM.isStale {
+                Text("stale")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundColor(.orange.opacity(0.85))
+            } else {
+                HStack(spacing: 8) {
+                    ForEach(rightProviders) { provider in
+                        CompactProviderBadge(
+                            provider: provider,
+                            includeReset: true,
+                            isActive: true
+                        )
+                    }
+                }
+            }
         }
+        .frame(width: mediaLiveActivityWidth, height: vm.effectiveClosedNotchHeight, alignment: .center)
     }
 }
 
